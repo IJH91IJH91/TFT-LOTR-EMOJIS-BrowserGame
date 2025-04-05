@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOTR Tactics</title>
+    <style>
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #333;
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23464646' fill-opacity='0.15' fill-rule='evenodd'/%3E%3C/svg%3E"), 
+                  linear-gradient(to bottom, #2d2b30, #1e1c22);
+            background-attachment: fixed;
+        }
+        
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-width: 800px;
+            position: relative;
+        }
+        
+        .battlefield {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 2px;
+            background-color: rgba(34, 34, 34, 0.6);
+            padding: 10px;
+            border-radius: 5px;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+            overflow: hidden;
+            border: 3px solid #16130d;
+        }
+        
+        .battlefield::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h100v100H0z' fill='none'/%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5z' fill='%23583c0e' fill-opacity='0.1'/%3E%3C/svg%3E"),
+                        url("data:image/svg+xml,%3Csvg width='52' height='26' viewBox='0 0 52 26' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23593e12' fill-opacity='0.1'%3E%3Cpath d='M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.95l8.486 8.486-1.414 1.414-8.486-8.486 1.414-1.414z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.6;
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        /* Enemy territory (top half) with transparent background */
+        .cell[data-row="0"], .cell[data-row="1"], .cell[data-row="2"], .cell[data-row="3"] {
+            background-color: rgba(74, 48, 48, 0.082);
+            background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h20L0 20z' fill='%23691818' fill-opacity='0.15'/%3E%3C/svg%3E");
+        }
+
+        /* Player territory (bottom half) with transparent background */
+        .cell[data-row="4"], .cell[data-row="5"], .cell[data-row="6"], .cell[data-row="7"] {
+            background-color: rgba(48, 74, 48, 0.09);
+            background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 0v20H0z' fill='%23186918' fill-opacity='0.15'/%3E%3C/svg%3E");
+        }
+                
+        .cell {
+            width: 60px;
+            height: 60px;
+            background-color: rgba(58, 58, 58, 0.6);
+            border: 1px solid rgba(85, 85, 85, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            transition: all 0.2s ease;
+        }
+
+        .cell:hover {
+            box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.2);
+        }
+
+        .bench {
+            display: flex;
+            gap: 5px;
+            background-color: rgba(73, 71, 41, 0.8);
+            padding: 7px;
+            border-radius: 5px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            border: 2px solid #78754f;
+            background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h20v20H0V0zm10 17.5a7.5 7.5 0 100-15 7.5 7.5 0 000 15zm0-2.5a5 5 0 110-10 5 5 0 010 10z' fill='%23bba954' fill-opacity='0.1'/%3E%3C/svg%3E");
+        }
+        
+        .bench-slot {
+            width: 60px;
+            height: 60px;
+            background-color: rgba(94, 90, 60, 0.6);
+            border: 1px solid rgba(120, 117, 79, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .shop {
+            display: flex;
+            gap: 5px;
+            background-color: rgba(41, 50, 74, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            border: 2px solid #4f5c78;
+            background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 0l9.5 5v10L10 20l-9.5-5V5L10 0zm0 2.5L5 5v10l5 2.5 5-2.5V5l-5-2.5z' fill='%234f5c78' fill-opacity='0.1'/%3E%3C/svg%3E");
+        }
+        
+        .shop-slot {
+            width: 60px;
+            height: 60px;
+            background-color: rgba(60, 70, 94, 0.6);
+            border: 1px solid rgba(79, 92, 120, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+        .shop-slot, .bench-slot {
+            position: relative; /* This is important for absolute positioning of children */
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+        
+        .unit {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: grab;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            font-weight: bold;
+            user-select: none;
+        }
+
+        .unit-name {
+            bottom: 555px; /* Moves it down */
+            left: 50%;
+            transform: translateX(50%);
+            font-size: 14px;
+        }
+        
+        /* Unit colors Unit colors Unit colors Unit colors Unit colors Unit colors Unit colors */
+        .unit.men {
+            background: linear-gradient(135deg, #2ea2d4, #0c3d78);
+            border: 2px solid #3972b0;
+            box-shadow: 0 0 5px rgba(79, 129, 189, 0.7);
+        }
+        
+        .unit.elves {
+            background: linear-gradient(135deg, #5dc824, #c2bd18);
+            border: 0.4px solid #8e9c0a;
+            box-shadow: 0 0 5px rgba(155, 187, 89, 0.7);
+        }
+        
+        .unit.rohan {
+            background: linear-gradient(135deg, #0de32d, #033c0e);
+            border: 0.4px solid #7e550f;
+            box-shadow: 0 0 5px rgba(155, 187, 89, 0.7);
+        }
+
+        .unit.dwarves {
+            background: linear-gradient(135deg, #c0504d, #9a302d);
+            border: 2px solid #b64340;
+            box-shadow: 0 0 5px rgba(192, 80, 77, 0.7);
+        }
+
+        .unit.evil { /* goblin ? */
+            background: linear-gradient(135deg, #3c7114, #002309);
+            border: 0.4px solid #7e130f;
+            box-shadow: 0 0 5px rgba(137, 34, 18, 0.7), inset 0 0 10px rgba(0, 0, 0, 0.4);
+            text-shadow: 0 0 3px #b50021;
+        }
+        .unit.harad {
+            background: linear-gradient(135deg, #463c32, #151312);
+            border: 0.4px solid #7e550f;
+            box-shadow: 0 0 5px rgba(137, 105, 18, 0.7), inset 0 0 10px rgba(0, 0, 0, 0.4);
+            text-shadow: 0 0 3px #b50021;
+        }
+        .unit.mordor {
+            background: linear-gradient(135deg, #894912, #5c3d0c);
+            border: 0.4px solid #7e550f;
+            box-shadow: 0 0 5px rgba(137, 105, 18, 0.7), inset 0 0 10px rgba(0, 0, 0, 0.4);
+            text-shadow: 0 0 3px #b50021;
+        }
+        .unit.east {
+            background: linear-gradient(135deg, #898912, #5c540c);
+            border: 0.4px solid #7e550f;
+            box-shadow: 0 0 5px rgb(137, 105, 18), inset 0 0 10px rgba(0, 0, 0, 0.4);
+            text-shadow: 0 0 3px #b50021;
+        }
+        .unit.isengard {
+            background: linear-gradient(135deg, #5b0909, #4a3201);
+            border: 0.4px solid #7e130f;
+            box-shadow: 0 0 5px rgba(137, 34, 18, 0.7), inset 0 0 10px rgba(0, 0, 0, 0.4);
+            text-shadow: 0 0 3px #b50021;
+        }
+
+
+
+
+        .unit.hero {
+            background: linear-gradient(135deg, #9b7400, #684e00);
+            border: 3px solid gold;
+            box-shadow: 0 0 8px rgba(255, 215, 0, 0.8), inset 0 0 15px rgba(255, 215, 0, 0.3);
+        }
+        
+        .unit::after {
+            position: absolute;
+            right: -3px;
+            top: -3px;
+            font-size: 14px;
+            display: block; /* Ensure it's always displayed */
+            z-index: 5; /* Make sure it's above other elements */
+        }
+
+
+
+        .unit.harad {
+            background: url('https://your-github-url.com/haradrim-unit.png') center center no-repeat;
+            background-size: contain;
+            border: none; /* Remove the border */
+            box-shadow: none; /* Remove the box shadow */
+        }
+
+        /* Keep the after pseudo-element for consistency but make it transparent if needed */
+        .unit.harad::after {
+            opacity: 0.7; /* Make it slightly transparent to blend with your image */
+        }
+
+        /* Make sure the health and mana bars still show up */
+        .unit.harad .health-bar,
+        .unit.harad .mana-bar {
+            /* Adjust as needed to ensure visibility */
+            z-index: 5;
+        }
+
+        /* Faction-based helmet icons FactionFactionFactionFactionFactionFaction   */
+    
+        .unit.men::after {     content: "⚜️"; font-size: 17px;      }
+        .unit.rohan::after {   content: "🐎"; font-size: 17px;      }
+        .unit.elves::after {   content: "🧝"; font-size: 19px;       }
+        .unit.dwarves::after { content: "⛏️"; font-size: 21px;      }
+        .unit.evil::after {    content: "🧟"; font-size: 21px;      }
+        .unit.harad::after {   content: "👳🏾‍♂️"; font-size: 21px;       }
+        .unit.east::after {    content: ""; display: block; width: 25px; height: 25px;
+            background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTK-YrMXvv2pOC3g5oFH3_C2kXvdUSR5v-G8g&s');
+            background-size: cover; background-position: center; position: absolute; }
+        .unit.isengard::after {   content: "👹"; font-size: 21px;       }
+        .unit.mordor::after {   content: "👤"; font-size: 21px;       }
+        .unit.hero::after {    content: "⚜️";                        }
+
+        /*  iCONS iCONS iCONS iCONS iCONS iCONS iCONS iCONS iCONS iCONS   */ 
+        /*   👳🏽‍♂️👳🏽‍♂️👳🏾‍♂️👳🏾‍♂️👳🏿‍♂️👳🏿‍♂️  🔥🔥🔥  🗡️ 🪓🪓 ⚔️ 👹 🦇🦇 🧟🧟  🕷️🕷️ 💀💀 ⛓️👑🌿👤 🔥🔥🔥     */  
+        /* Unit icons UnitUnitUnitUnitUnitUnitUnitUnitUnitUnitUnitUnitUnitt   */ 
+
+        .unit.melee::before {  content: "⚔️";   font-size: 26px; }
+        .unit.archer::before { content: "🏹";   font-size: 26px; }
+        .unit.healer::before { content: "🌿";   font-size: 26px; }
+        .unit.tank::before {   content: "🛡️";   font-size: 26px; }
+
+        .unit.harad.tank::before {   content: "🛡️🗡️";   font-size: 20px; }
+        .unit.harad.melee::before {   content: "🗡️🗡️";   font-size: 18px; }
+        .unit.harad.archer::before {   content: "🏹🔥";   font-size: 18px; }
+
+        .unit.isengard.tank::before {   content: "🛡️⛏️";   font-size: 20px; }
+        .unit.isengard.melee::before {   content: "⛏️⛏️";   font-size: 20px; }
+    
+        .unit.mordor.melee::before { content: " "; display: block;
+            background-image: url('https://e7.pngegg.com/pngimages/143/170/png-clipart-grey-and-black-medieval-sword-the-lord-of-the-rings-aragorn-gandalf-arwen-sword-sword-free-texture-dagger-thumbnail.png');
+            width: 20px; height: 20px; background-size: cover; background-position: center; position: absolute; }
+
+        .unit.evil.melee::before {   content: "🗡️";   font-size: 20px; }
+
+        .unit.east.tank::before {   content: "🛡️🛡️";   font-size: 20px; }
+
+
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        
+        /* Battlefield grid enhancements */
+        .battlefield {
+            position: relative;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+
+
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4a5e82;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        button:hover {
+            background-color: #5a6e92;
+        }
+        
+        .gold {
+            font-size: 18px;
+            font-weight: bold;
+            color: gold;
+        }
+        
+        .dragging {
+            opacity: 0.7;
+            position: absolute;
+            pointer-events: none;
+        }
+        
+        /* Animation for attacking */
+        .unit.attacking {
+            animation: attack 0.3s ease-in-out;
+        }
+
+        @keyframes attack {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        /* Animation for taking damage */
+        .unit.taking-damage {
+            animation: damage 0.3s ease-in-out;
+        }
+
+        @keyframes damage {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-3px); }
+            50% { transform: translateX(3px); }
+            75% { transform: translateX(-3px); }
+            100% { transform: translateX(0); }
+        }
+
+        /* Health bar styling */
+        .health-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background-color: #333;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .health-fill {
+            width: 100%;
+            height: 100%;
+            background-color: #3f3;
+            transition: width 0.3s ease, background-color 0.3s ease;
+        }
+
+        /* Mana bar styles */
+        .mana-bar {
+            position: absolute;
+            bottom: 5px;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background-color: #0f2eab;
+            z-index: 10;
+        }
+
+        .mana-fill {
+            height: 100%;
+            background-color: rgb(0, 221, 255);
+            transition: width 0.2s ease-out;
+        }
+
+        /* Attack speed indicator */
+        .unit::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 2px;
+            background-color: rgba(255, 255, 0, 0.5);
+            width: 0%;
+            z-index: 5;
+            transition: width 0.1s linear;
+        }
+
+        /* Ability animations */
+        .casting-ability {
+            filter: brightness(1.5);
+            transform: scale(1.2);
+            transition: all 0.3s ease;
+        }
+
+        .ability-effect {
+            animation: flash 0.3s;
+        }
+
+        @keyframes flash {
+            0% { filter: brightness(1); }
+            50% { filter: brightness(1.8); }
+            100% { filter: brightness(1); }
+        }
+
+        /* Shield effect */
+        .shield-effect {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.1); }
+            100% { opacity: 0.3; transform: scale(1); }
+        }
+
+        /* Unit hover effect */
+        .unit:hover {
+            transform: scale(1.1);
+            z-index: 10;
+            transition: transform 0.2s ease;
+        }
+
+        /* Game title styling */
+        h1 {
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+            color: #ffd700;
+            margin-bottom: 20px;
+        }
+
+        /* Section labels */
+        .section-label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #ffd700;
+        }
+
+        /* Improve bench and shop styling */
+        .bench, .shop {
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Button styling enhancement */
+        button {
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        button:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Gold display enhancement */
+        .gold {
+            text-shadow: 0 0 5px rgba(255, 215, 0, 0.7);
+            display: flex;
+            align-items: center;
+        }
+
+        .gold::before {
+            content: "💰";
+            margin-right: 5px;
+        }
+
+        .audio-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 100;
+        }
+
+        .music-button {
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: 2px solid gold;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .music-button:hover {
+            background-color: rgba(0, 0, 0, 0.7);
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <h1>LOTR Tactics</h1>
+    
+    <div class="game-container">
+        <div class="controls">
+            <button id="start-combat">Start Combat</button>
+            <button id="refresh-shop">Refresh Shop (1 Gold)</button>
+            <div class="gold">Gold: <span id="gold-amount">50</span></div>
+        
+        
+        <div class="audio-controls">
+            <button id="music-toggle" class="music-button">🔊</button>
+            <audio id="background-music" loop>
+                <source src="https://ia803408.us.archive.org/22/items/stmp3.net_lords-of-the-rings-soundtrack-hd/Lord%20Of%20The%20Rings%20-%20Main%20Theme.mp3" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+        </div></div>
+
+        <div class="shop">
+            <div class="shop-slot" data-slot="0"></div>
+            <div class="shop-slot" data-slot="1"></div>
+            <div class="shop-slot" data-slot="2"></div>
+            <div class="shop-slot" data-slot="3"></div>
+            <div class="shop-slot" data-slot="4"></div>
+        </div>
+        
+        <div class="battlefield" id="battlefield">
+            <!-- Grid cells will be generated by JavaScript -->
+        </div>
+        
+        <div class="bench">
+            <div class="bench-slot" data-slot="0"></div>
+            <div class="bench-slot" data-slot="1"></div>
+            <div class="bench-slot" data-slot="2"></div>
+            <div class="bench-slot" data-slot="3"></div>
+            <div class="bench-slot" data-slot="4"></div>
+            <div class="bench-slot" data-slot="5"></div>
+            <div class="bench-slot" data-slot="6"></div>
+            <div class="bench-slot" data-slot="7"></div>
+            <div class="bench-slot" data-slot="8"></div>
+        </div>
+    </div>
+
+    <!-- Load scripts in the correct order -->
+    <script src="unitInfo.js"></script>
+    <script src="traitDisplay.js"></script>
+    <script src="battleLogic.js"></script>
+    <script src="gameBoard.js"></script>
