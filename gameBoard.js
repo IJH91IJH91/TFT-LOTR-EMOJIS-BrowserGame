@@ -1,7 +1,7 @@
 // gameBoard.js - Handles shop, bench, battlefield, and placement logic
 
 // Game state variables
-let gold = 50;
+let gold = 25;
 let draggedUnit = null;
 let draggedParent = null;
 const GRID_SIZE = 8;
@@ -79,6 +79,7 @@ function placeEnemyUnits() {
             const cell = battlefield.querySelector(`[data-row="${row}"][data-col="${col}"]`);
             if (cell && !cell.querySelector('.unit')) {
                 const enemyUnitData = { ...unitData, isEnemy: true };
+                console.log('[GameBoard - PlaceEnemy] Placing enemy unit. enemyUnitData:', JSON.stringify(enemyUnitData));
                 window.UnitInfo.createUnitElement(enemyUnitData, cell);
             }
         });
@@ -121,32 +122,80 @@ function setupDragDropListeners() {
         target.addEventListener('dragover', (e) => {
             e.preventDefault();
         });
-        
+    
         target.addEventListener('drop', (e) => {
             e.preventDefault();
             if (draggedUnit && draggedParent) {
-                // Check if dropping on battlefield
-                if (target.classList.contains('cell')) {
+                const targetIsBattlefieldCell = target.classList.contains('cell') && target.closest('#battlefield');
+                const targetIsBenchSlot = target.classList.contains('bench-slot');
+                const sourceWasBattlefieldCell = draggedParent.classList.contains('cell') && draggedParent.closest('#battlefield');
+                const sourceWasBenchSlot = draggedParent.classList.contains('bench-slot');
+    
+                // --- Validation Checks (Keep these) ---
+                if (targetIsBattlefieldCell) {
                     const row = parseInt(target.dataset.row);
-                    // Only allow player units in bottom half
-                    if (row < 4 && !draggedUnit.dataset.isEnemy) {
+                    // Only allow player units in bottom half (Rows 4-7 for 8x8 grid)
+                    if (row < 4 && !draggedUnit.dataset.isEnemy) { // Assuming 0-3 is enemy, 4-7 is player side
                         alert('You can only place units in the bottom half of the battlefield!');
+                        // Important: Reset opacity even on failure
+                        if (draggedUnit) draggedUnit.style.opacity = '1';
+                        draggedUnit = null;
+                        draggedParent = null;
                         return;
                     }
                 }
-                
-                // Don't allow drops if target already has a unit
-                if (!target.querySelector('.unit')) {
-                    target.appendChild(draggedUnit);
-                }
-            }
-        });
-    });
     
-    // Reset drag state on dragend
+                // Don't allow drops if target already has a unit AND isn't the original parent
+                if (target.querySelector('.unit') && target !== draggedParent) {
+                     // Maybe swap units later, for now, prevent drop or return unit to original parent
+                     // For simplicity, just return unit if target is occupied
+                     console.log("Target cell occupied.");
+                     if (draggedParent && !draggedParent.querySelector('.unit')) {
+                         draggedParent.appendChild(draggedUnit); // Put it back
+                     }
+                     // Reset opacity even on failure
+                     if (draggedUnit) draggedUnit.style.opacity = '1';
+                     draggedUnit = null;
+                     draggedParent = null;
+                     return;
+                }
+                // --- End Validation Checks ---
+    
+    
+                // --- Move Unit and Dispatch Events ---
+                // Append unit to the new target cell/slot
+                target.appendChild(draggedUnit);
+    
+                // Check if the move affects the battlefield composition and dispatch events
+                if (targetIsBattlefieldCell && sourceWasBenchSlot) {
+                    // Moved FROM Bench TO Battlefield
+                    console.log('Dispatching unitAdded event');
+                    document.dispatchEvent(new CustomEvent('unitAdded', { detail: { unit: draggedUnit } }));
+                } else if (targetIsBenchSlot && sourceWasBattlefieldCell) {
+                    // Moved FROM Battlefield TO Bench
+                    console.log('Dispatching unitRemoved event');
+                    document.dispatchEvent(new CustomEvent('unitRemoved', { detail: { unit: draggedUnit } }));
+                }
+                // NOTE: Moving within the battlefield or within the bench doesn't require unitAdded/unitRemoved
+                //       but might require updates if traits depend on position (which they currently don't).
+    
+                // --- Reset Drag State (Moved inside the if block) ---
+                 if (draggedUnit) draggedUnit.style.opacity = '1'; // Reset opacity after successful drop
+                 draggedUnit = null;
+                 draggedParent = null;
+    
+            } // End if (draggedUnit && draggedParent)
+        }); // End drop listener
+    }); // End dropTargets.forEach
+    
     document.addEventListener('dragend', () => {
-        if (draggedUnit) {
+        if (draggedUnit) { // If draggedUnit still exists, drop failed or wasn't on a valid target
+            console.log("Drag ended, resetting potentially failed drag.");
             draggedUnit.style.opacity = '1';
+            // Optional: ensure it's back in its original parent if possible
+            if (draggedParent && !draggedParent.contains(draggedUnit) && !draggedParent.querySelector('.unit')) {
+                 draggedParent.appendChild(draggedUnit);
+            }
             draggedUnit = null;
             draggedParent = null;
         }
@@ -162,42 +211,53 @@ function setupEventListeners() {
     const shopSlots = document.querySelectorAll('.shop-slot');
     shopSlots.forEach(slot => {
         slot.addEventListener('click', () => {
-            const unit = slot.querySelector('.unit');
-            if (unit) {
-                const cost = parseInt(unit.dataset.cost);
+            const unitElementInShop = slot.querySelector('.unit'); // Renamed for clarity
+            if (unitElementInShop) {
+                const cost = parseInt(unitElementInShop.dataset.cost);
                 if (gold >= cost) {
                     gold -= cost;
                     updateGoldDisplay();
-                    
+
                     // Find first empty bench slot
                     const benchSlots = document.querySelectorAll('.bench-slot');
                     let placed = false;
-                    
+
                     for (let benchSlot of benchSlots) {
                         if (!benchSlot.querySelector('.unit')) {
-                            // Clone unit data and create new unit on bench
-                            const unitData = {
-                                name: unit.dataset.name,
-                                faction: unit.dataset.faction,
-                                type: unit.dataset.type,
-                                health: parseInt(unit.dataset.health),
-                                maxHealth: parseInt(unit.dataset.maxHealth),
-                                attack: parseInt(unit.dataset.attack),
-                                range: parseInt(unit.dataset.range)
-                            };
-                            
-                            const newUnit = window.UnitInfo.createUnitElement(unitData, benchSlot);
-                            placed = true;
-                            break;
+
+                            // --- MODIFICATION START ---
+                            // Find the original unit definition from unitInfo.js based on name
+                            const unitName = unitElementInShop.dataset.name;
+                            const originalUnitData = window.UnitInfo.unitTypes.find(u => u.name === unitName); // Find the full definition
+
+                            if (originalUnitData) {
+                                // Use a copy of the original data to pass to createUnitElement
+                                // This ensures ALL properties, including 'traits', are included.
+                                const unitDataForBench = { ...originalUnitData };
+
+                                console.log('[GameBoard - ShopClick] Found original data:', JSON.stringify(unitDataForBench)); // Optional debug
+                                const newUnit = window.UnitInfo.createUnitElement(unitDataForBench, benchSlot); // Pass the full data object
+
+                                placed = true;
+
+                            } else {
+                                console.error(`Could not find original unit data for ${unitName}`);
+                                // Handle error: maybe refund gold?
+                                gold += cost;
+                                updateGoldDisplay();
+                            }
+                            // --- MODIFICATION END ---
+
+                            if (placed) break; // Exit loop once placed
                         }
                     }
-                    
+
                     if (!placed) {
                         alert('Your bench is full! Sell units to make space.');
                         gold += cost; // Refund gold
                         updateGoldDisplay();
                     } else {
-                        // Remove unit from shop
+                        // Remove unit element from shop slot
                         slot.innerHTML = '';
                     }
                 } else {
@@ -206,6 +266,7 @@ function setupEventListeners() {
             }
         });
     });
+
     
     // Combat button
     document.getElementById('start-combat').addEventListener('click', () => {
@@ -245,39 +306,6 @@ function resetBattlefield() {
     // Refresh shop
     setupShop();
 }
-
-// Music control // Music control // Music control
-document.addEventListener('DOMContentLoaded', function() {
-    const musicButton = document.getElementById('music-toggle');
-    const music = document.getElementById('background-music');
-    let isMusicPlaying = false;
-    
-    // Set initial volume
-    music.volume = 0.3;
-    
-    musicButton.addEventListener('click', function() {
-        if (isMusicPlaying) {
-            music.pause();
-            musicButton.textContent = '🔇';
-            isMusicPlaying = false;
-        } else {
-            // Start playing only if this is user-initiated
-            music.play().catch(error => {
-                console.error("Music playback failed:", error);
-                // Most browsers require user interaction before audio can play
-                alert("Click again to play music (browser requires user interaction)");
-            });
-            musicButton.textContent = '🔊';
-            isMusicPlaying = true;
-        }
-    });
-    
-    // Auto-play attempt (most browsers will block this)
-    music.play().catch(error => {
-        console.error("Auto-play failed as expected:", error);
-        // This is normal, as browsers require user interaction
-    });
-});
 
 // Add gold to player's account
 function addGold(amount) {

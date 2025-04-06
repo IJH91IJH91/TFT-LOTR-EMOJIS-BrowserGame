@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LOTR Tactics</title>
     <style>
         
         body {
@@ -13,24 +12,41 @@
             margin: 0;
             padding: 20px;
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23464646' fill-opacity='0.15' fill-rule='evenodd'/%3E%3C/svg%3E"), 
+            justify-content: center; /* Center horizontally */
+            align-items: flex-start; /* Align items to the top */
+            min-height: 100vh; /* Ensure body takes full height */
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23464646' fill-opacity='0.15' fill-rule='evenodd'/%3E%3C/svg%3E"),
                   linear-gradient(to bottom, #2d2b30, #1e1c22);
             background-attachment: fixed;
+        }
+        h1 {
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+            color: #ffd700;
+            margin-bottom: 20px;
+            text-align: center; /* Center the main title */
+            width: 100%; /* Make title span width for centering */
         }
         
         .game-container {
             display: flex;
-            flex-direction: column;
+            flex-direction: row; /* Traits left, main game right */
             gap: 20px;
-            max-width: 800px;
-            position: relative;
+            /* max-width: 1200px; /* Adjust max-width as needed */
+            width: fit-content; /* Or a specific width like 1000px */
+            align-items: flex-start; /* Align items to top */
+            position: relative; /* Keep for potential absolute elements like audio */
         }
-        
+        .main-game-area {
+            display: flex;
+            flex-direction: column; /* Stack shop, field, bench vertically */
+            gap: 20px; /* Space between shop/field/bench */
+            flex-grow: 1; /* Allow this area to take available space if needed */
+            min-width: 510px; /* Ensure minimum width based on battlefield/shop */
+        }
+
         .battlefield {
             display: grid;
-            grid-template-columns: repeat(8, 1fr);
+            grid-template-columns: repeat(8, 1fr); /* Use fr units for flexibility */
             gap: 2px;
             background-color: rgba(34, 34, 34, 0.6);
             padding: 10px;
@@ -39,103 +55,63 @@
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
             overflow: hidden;
             border: 3px solid #16130d;
+            /* width: 500px; Set a fixed width or let grid handle it */
+            aspect-ratio: 1 / 1; /* Make it square */
+            max-width: 500px; /* Limit max size */
         }
-        
-        .battlefield::before {
+        .battlefield::before { /* Battlefield background patterns */
             content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h100v100H0z' fill='none'/%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5z' fill='%23583c0e' fill-opacity='0.1'/%3E%3C/svg%3E"),
-                        url("data:image/svg+xml,%3Csvg width='52' height='26' viewBox='0 0 52 26' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23593e12' fill-opacity='0.1'%3E%3Cpath d='M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.95l8.486 8.486-1.414 1.414-8.486-8.486 1.414-1.414z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-            opacity: 0.6;
-            z-index: 0;
-            pointer-events: none;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url("..."), url("..."); /* Your existing background SVGs */
+            opacity: 0.6; z-index: 0; pointer-events: none;
         }
-        
-        /* Enemy territory (top half) with transparent background */
+    
         .cell[data-row="0"], .cell[data-row="1"], .cell[data-row="2"], .cell[data-row="3"] {
-            background-color: rgba(74, 48, 48, 0.082);
+            background-color: rgba(74, 48, 48, 0.082);/* Enemy territory (top half) with transparent background */
             background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h20L0 20z' fill='%23691818' fill-opacity='0.15'/%3E%3C/svg%3E");
         }
-
-        /* Player territory (bottom half) with transparent background */
         .cell[data-row="4"], .cell[data-row="5"], .cell[data-row="6"], .cell[data-row="7"] {
-            background-color: rgba(48, 74, 48, 0.09);
+            background-color: rgba(48, 74, 48, 0.09);/* Player territory (bottom half) with transparent background */
             background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 0v20H0z' fill='%23186918' fill-opacity='0.15'/%3E%3C/svg%3E");
-        }
-                
+        }       
         .cell {
-            width: 60px;
-            height: 60px;
+            aspect-ratio: 1 / 1; /* Make cells square */
             background-color: rgba(58, 58, 58, 0.6);
             border: 1px solid rgba(85, 85, 85, 0.6);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            z-index: 1;
-            transition: all 0.2s ease;
+            display: flex; justify-content: center; align-items: center;
+            position: relative; z-index: 1; transition: all 0.2s ease;
         }
-
-        .cell:hover {
-            box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.2);
-        }
-
-        .bench {
-            display: flex;
-            gap: 5px;
-            background-color: rgba(73, 71, 41, 0.8);
-            padding: 7px;
-            border-radius: 5px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
-            border: 2px solid #78754f;
-            background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h20v20H0V0zm10 17.5a7.5 7.5 0 100-15 7.5 7.5 0 000 15zm0-2.5a5 5 0 110-10 5 5 0 010 10z' fill='%23bba954' fill-opacity='0.1'/%3E%3C/svg%3E");
-        }
+        .cell:hover { box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.2); }
         
-        .bench-slot {
-            width: 60px;
-            height: 60px;
-            background-color: rgba(94, 90, 60, 0.6);
-            border: 1px solid rgba(120, 117, 79, 0.6);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .shop {
-            display: flex;
+        /* Shop and Bench styling */
+        .shop, .bench {
+            display: flex; /* Use flex for horizontal items */
             gap: 5px;
-            background-color: rgba(41, 50, 74, 0.8);
             padding: 10px;
             border-radius: 5px;
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
-            border: 2px solid #4f5c78;
-            background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 0l9.5 5v10L10 20l-9.5-5V5L10 0zm0 2.5L5 5v10l5 2.5 5-2.5V5l-5-2.5z' fill='%234f5c78' fill-opacity='0.1'/%3E%3C/svg%3E");
+            width: fit-content; /* Size based on content */
+            margin: 0 auto; /* Center shop/bench within main-game-area if needed */
         }
-        
-        .shop-slot {
-            width: 60px;
-            height: 60px;
-            background-color: rgba(60, 70, 94, 0.6);
-            border: 1px solid rgba(79, 92, 120, 0.6);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
+        .shop {
+            background-color: rgba(41, 50, 74, 0.8);
+            border: 2px solid #4f5c78;
+            background-image: url("..."); /* Your shop background SVG */
+        }
+        .bench {
+            background-color: rgba(73, 71, 41, 0.8);
+            border: 2px solid #78754f;
+            background-image: url("..."); /* Your bench background SVG */
         }
         .shop-slot, .bench-slot {
-            position: relative; /* This is important for absolute positioning of children */
-            width: 60px;
-            height: 60px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: all 0.2s ease;
+            width: 60px; height: 60px; /* Keep fixed size for slots */
+            display: flex; justify-content: center; align-items: center;
+            position: relative; transition: all 0.2s ease;
         }
-        
+
+        .shop-slot { background-color: rgba(60, 70, 94, 0.6); border: 1px solid rgba(79, 92, 120, 0.6); cursor: pointer; }
+        .bench-slot { background-color: rgba(94, 90, 60, 0.6); border: 1px solid rgba(120, 117, 79, 0.6); }
+
         .unit {
             width: 50px;
             height: 50px;
@@ -148,39 +124,37 @@
             font-weight: bold;
             user-select: none;
         }
-
         .unit-name {
             bottom: 555px; /* Moves it down */
             left: 50%;
             transform: translateX(50%);
             font-size: 14px;
         }
-        
+
+        /* Unit colors Unit colors Unit colors Unit colors Unit colors Unit colors Unit colors */
         /* Unit colors Unit colors Unit colors Unit colors Unit colors Unit colors Unit colors */
         .unit.men {
             background: linear-gradient(135deg, #2ea2d4, #0c3d78);
             border: 2px solid #3972b0;
             box-shadow: 0 0 5px rgba(79, 129, 189, 0.7);
         }
-        
+    
         .unit.elves {
             background: linear-gradient(135deg, #5dc824, #c2bd18);
             border: 0.4px solid #8e9c0a;
             box-shadow: 0 0 5px rgba(155, 187, 89, 0.7);
         }
-        
+    
         .unit.rohan {
             background: linear-gradient(135deg, #0de32d, #033c0e);
             border: 0.4px solid #7e550f;
             box-shadow: 0 0 5px rgba(155, 187, 89, 0.7);
         }
-
         .unit.dwarves {
             background: linear-gradient(135deg, #c0504d, #9a302d);
             border: 2px solid #b64340;
             box-shadow: 0 0 5px rgba(192, 80, 77, 0.7);
         }
-
         .unit.evil { /* goblin ? */
             background: linear-gradient(135deg, #3c7114, #002309);
             border: 0.4px solid #7e130f;
@@ -211,13 +185,14 @@
             box-shadow: 0 0 5px rgba(137, 34, 18, 0.7), inset 0 0 10px rgba(0, 0, 0, 0.4);
             text-shadow: 0 0 3px #b50021;
         }
-
-
-
-
-        .unit.hero {
+        .unit.hobbit {
             background: linear-gradient(135deg, #9b7400, #684e00);
-            border: 3px solid gold;
+            border: 3px solid rgb(0, 142, 40);
+            box-shadow: 0 0 8px rgba(255, 215, 0, 0.8), inset 0 0 15px rgba(255, 215, 0, 0.3);
+        }
+        .unit.wizard {
+            background: linear-gradient(135deg, #00ffe5, #17393f);
+            border: 3px solid rgb(10, 127, 206);
             box-shadow: 0 0 8px rgba(255, 215, 0, 0.8), inset 0 0 15px rgba(255, 215, 0, 0.3);
         }
         
@@ -230,27 +205,17 @@
             z-index: 5; /* Make sure it's above other elements */
         }
 
-
-
         .unit.harad {
             background: url('https://your-github-url.com/haradrim-unit.png') center center no-repeat;
             background-size: contain;
             border: none; /* Remove the border */
             box-shadow: none; /* Remove the box shadow */
         }
-
         /* Keep the after pseudo-element for consistency but make it transparent if needed */
-        .unit.harad::after {
-            opacity: 0.7; /* Make it slightly transparent to blend with your image */
-        }
-
+        .unit.harad::after { opacity: 0.7; }
         /* Make sure the health and mana bars still show up */
         .unit.harad .health-bar,
-        .unit.harad .mana-bar {
-            /* Adjust as needed to ensure visibility */
-            z-index: 5;
-        }
-
+        .unit.harad .mana-bar { z-index: 5; }
         /* Faction-based helmet icons FactionFactionFactionFactionFactionFaction   */
     
         .unit.men::after {     content: "⚜️"; font-size: 17px;      }
@@ -294,11 +259,15 @@
 
         .controls {
             display: flex;
-            justify-content: space-between;
+            justify-content: space-between; /* Space out buttons/gold */
             gap: 10px;
+            align-items: center; /* Vertically align items */
+            padding: 0 10px; /* Add some padding */
+            width: 100%; /* Make controls span width of main-game-area */
+            box-sizing: border-box; /* Include padding in width calculation */
         }
         
-        /* Battlefield grid enhancements */
+        /* delete this or not? try DELETE IT :D */
         .battlefield {
             position: relative;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
@@ -480,7 +449,7 @@
         .gold {
             text-shadow: 0 0 5px rgba(255, 215, 0, 0.7);
             display: flex;
-            align-items: center;
+            
         }
 
         .gold::before {
@@ -514,53 +483,51 @@
             background-color: rgba(0, 0, 0, 0.7);
             transform: scale(1.1);
         }
-    </style>
+</style>
 </head>
-<body>
-    <h1>LOTR Tactics</h1>
-    
-    <div class="game-container">
-        <div class="controls">
-            <button id="start-combat">Start Combat</button>
-            <button id="refresh-shop">Refresh Shop (1 Gold)</button>
-            <div class="gold">Gold: <span id="gold-amount">50</span></div>
-        
-        
-        <div class="audio-controls">
-            <button id="music-toggle" class="music-button">🔊</button>
-            <audio id="background-music" loop>
-                <source src="https://ia803408.us.archive.org/22/items/stmp3.net_lords-of-the-rings-soundtrack-hd/Lord%20Of%20The%20Rings%20-%20Main%20Theme.mp3" type="audio/mpeg">
-                Your browser does not support the audio element.
-            </audio>
-        </div></div>
 
-        <div class="shop">
-            <div class="shop-slot" data-slot="0"></div>
-            <div class="shop-slot" data-slot="1"></div>
-            <div class="shop-slot" data-slot="2"></div>
-            <div class="shop-slot" data-slot="3"></div>
-            <div class="shop-slot" data-slot="4"></div>
+<body>
+    <div class="game-container">
+        <div class="main-game-area">
+            <div class="controls">
+                <button id="start-combat">Start Combat</button>
+                <button id="refresh-shop">Refresh Shop (1 Gold)</button>
+                <div class="gold">Gold: <span id="gold-amount">??</span></div>
+            </div>
+
+            <div class="shop">
+                <div class="shop-slot" data-slot="0"></div>
+                <div class="shop-slot" data-slot="1"></div>
+                <div class="shop-slot" data-slot="2"></div>
+                <div class="shop-slot" data-slot="3"></div>
+                <div class="shop-slot" data-slot="4"></div>
+                <div class="shop-slot" data-slot="5"></div>
+                <div class="shop-slot" data-slot="6"></div>
+                <div class="shop-slot" data-slot="7"></div>
+            </div>
+
+            <div class="battlefield" id="battlefield">
+                </div>
+
+            <div class="bench">
+                <div class="bench-slot" data-slot="0"></div>
+                <div class="bench-slot" data-slot="1"></div>
+                <div class="bench-slot" data-slot="2"></div>
+                <div class="bench-slot" data-slot="3"></div>
+                <div class="bench-slot" data-slot="4"></div>
+                <div class="bench-slot" data-slot="5"></div>
+                <div class="bench-slot" data-slot="6"></div>
+                <div class="bench-slot" data-slot="7"></div>
+                <div class="bench-slot" data-slot="8"></div>
+            </div>
         </div>
+
         
-        <div class="battlefield" id="battlefield">
-            <!-- Grid cells will be generated by JavaScript -->
-        </div>
-        
-        <div class="bench">
-            <div class="bench-slot" data-slot="0"></div>
-            <div class="bench-slot" data-slot="1"></div>
-            <div class="bench-slot" data-slot="2"></div>
-            <div class="bench-slot" data-slot="3"></div>
-            <div class="bench-slot" data-slot="4"></div>
-            <div class="bench-slot" data-slot="5"></div>
-            <div class="bench-slot" data-slot="6"></div>
-            <div class="bench-slot" data-slot="7"></div>
-            <div class="bench-slot" data-slot="8"></div>
-        </div>
     </div>
 
-    <!-- Load scripts in the correct order -->
     <script src="unitInfo.js"></script>
     <script src="traitDisplay.js"></script>
     <script src="battleLogic.js"></script>
     <script src="gameBoard.js"></script>
+</body>
+</html>

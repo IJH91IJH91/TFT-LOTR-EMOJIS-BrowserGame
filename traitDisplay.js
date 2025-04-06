@@ -10,9 +10,17 @@ function createTraitsContainer() {
     traitsContainer.id = 'traits-container';
     traitsContainer.className = 'traits-container';
     
-    // Insert it before the battlefield
-    gameContainer.insertBefore(traitsContainer, battlefield);
-    
+    // Find the main game area div, which IS a direct child of gameContainer
+    const mainGameArea = gameContainer.querySelector('.main-game-area');
+
+    // Insert the traitsContainer before the main game area
+    if (mainGameArea) {
+        gameContainer.insertBefore(traitsContainer, mainGameArea);
+    } else {
+        console.error("Could not find .main-game-area to insert traits container before.");
+        gameContainer.appendChild(traitsContainer);
+    }
+
     // Add the traits container
     const activeTraits = document.createElement('div');
     activeTraits.id = 'active-traits';
@@ -31,48 +39,66 @@ function createTraitsContainer() {
 
 // Update the active traits display
 function updateTraitsDisplay() {
-    const activeTraits = document.getElementById('active-traits');
-    if (!activeTraits) return;
-    
-    // Clear existing traits
-    activeTraits.innerHTML = '';
-    
-    // Get all units on the battlefield (not on bench or shop)
+    console.log("--- Running updateTraitsDisplay ---"); // <<< ADDED
+    const activeTraitsContainer = document.getElementById('active-traits');
+    if (!activeTraitsContainer) {
+        console.log("Error: #active-traits container not found."); // <<< ADDED
+        return;
+    }
+
+    activeTraitsContainer.innerHTML = ''; // Clear existing content
+
     const battlefieldUnits = document.querySelectorAll('#battlefield .unit');
-    
-    // Count traits
+    console.log('Battlefield Units Found:', battlefieldUnits.length); // <<< ADDED
+
     const traitCounts = {};
     battlefieldUnits.forEach(unit => {
-        if (!unit.dataset.traits) return;
-        
-        // Parse traits from data attribute
-        const traits = JSON.parse(unit.dataset.traits || '[]');
-        
-        traits.forEach(trait => {
-            if (!traitCounts[trait]) {
-                traitCounts[trait] = {
-                    count: 0,
-                    units: []
-                };
-            }
-            traitCounts[trait].count++;
-            traitCounts[trait].units.push(unit.dataset.name);
-        });
+        // --- ADDED Debugging inside unit loop ---
+        console.log(`Processing Unit: ${unit.dataset.name}, Is Enemy: ${unit.dataset.isEnemy}`);
+        if (unit.dataset.isEnemy === 'true') {
+             console.log(`Skipping enemy unit: ${unit.dataset.name}`);
+             return;
+        }
+        console.log(`Unit data-traits attribute:`, unit.dataset.traits);
+         if (!unit.dataset.traits) {
+             console.log(`Skipping unit ${unit.dataset.name}: No data-traits attribute.`);
+             return;
+         }
+        // --- END ADDED Debugging ---
+
+        try { // Add try-catch for parsing robustness
+            const traits = JSON.parse(unit.dataset.traits || '[]');
+            console.log(`Parsed Traits for ${unit.dataset.name}:`, traits); // <<< ADDED
+
+            traits.forEach(trait => {
+                if (!traitCounts[trait]) {
+                    traitCounts[trait] = { count: 0, units: [] };
+                }
+                traitCounts[trait].count++;
+                if (!traitCounts[trait].units.includes(unit.dataset.name)) {
+                    traitCounts[trait].units.push(unit.dataset.name);
+                }
+            });
+        } catch (e) {
+             console.error(`Error parsing traits for unit ${unit.dataset.name}:`, unit.dataset.traits, e); // <<< ADDED Error Catching
+        }
     });
+
+    console.log('Final Trait Counts:', JSON.stringify(traitCounts)); // <<< ADDED (stringify for better object view)
+
     
-    // Display traits
+
+    // Display the traits that were actually counted
     Object.keys(traitCounts).sort().forEach(trait => {
+        console.log(`Attempting to display trait: ${trait}`); // <<< ADDED
         const count = traitCounts[trait].count;
         const units = traitCounts[trait].units;
-        
-        // Create trait element
+
         const traitElement = document.createElement('div');
         traitElement.className = 'trait-item';
-        
-        // Add trait icon based on trait name
+
         const traitIcon = getTraitIcon(trait);
-        
-        // Create trait content
+
         traitElement.innerHTML = `
             <div class="trait-icon">${traitIcon}</div>
             <div class="trait-info">
@@ -80,29 +106,31 @@ function updateTraitsDisplay() {
                 <div class="trait-description">${getTraitDescription(trait, count)}</div>
             </div>
         `;
-        
-        // Add tooltip with unit names
         traitElement.title = `Units: ${units.join(', ')}`;
-        
-        // Add trait element to container
-        activeTraits.appendChild(traitElement);
-        
-        // Add active class if trait bonus is active
+
         if (isTraitBonusActive(trait, count)) {
             traitElement.classList.add('trait-active');
+            traitElement.classList.remove('trait-inactive');
+        } else {
+            traitElement.classList.add('trait-inactive');
+            traitElement.classList.remove('trait-active');
         }
+
+        activeTraitsContainer.appendChild(traitElement);
+        console.log(`Successfully appended element for trait: ${trait}`); // <<< ADDED
     });
+     console.log("--- Finished updateTraitsDisplay ---"); // <<< ADDED
 }
 
 // Get trait icon based on trait name
 function getTraitIcon(trait) {
-    const icons = {
+    const icons = { // small icon in TOP LEFT
         'Gondor': '⚜️',
-        'Warrior': '⚔️',
-        'Ranger': '🏹',
-        'Cavalry': '🐎',
-        'Defender': '🛡️',
-        'Healer': '🌿',
+        '': '⚔️',
+        '': '🏹',
+        '': '🐎',
+        '': '🛡️',
+        '': '🌿',
         'Rohan': '🐎',
         'Dwarves': '⛏️',
         'Elves': '🧝',
@@ -111,10 +139,10 @@ function getTraitIcon(trait) {
         'East': '🗡️',
         'Harad': '👳🏾‍♂️',
         'Goblin': '👺',
-        'Scavenger': '🗑️',
-        'Berserker': '🔥',
-        'Royalty': '👑',
-        'Spearman': '🔱'
+        '': '🗑️',
+        '': '🔥',
+        '': '👑',
+        '': '🔱'
     };
     
     return icons[trait] || '✦';
@@ -129,125 +157,108 @@ function getTraitDescription(trait, count) {
                 2: '+10% defense',
                 4: '+25% defense',
                 6: '+40% defense'
-            }
-        },
-        'Warrior': {
+            } },
+        'Fellowship': {
             description: 'Warriors deal increased damage',
             thresholds: {
                 2: '+10% attack damage',
                 4: '+20% attack damage',
                 6: '+35% attack damage'
-            }
-        },
-        'Ranger': {
+            } },
+        'Gbros': {
             description: 'Rangers gain attack range',
             thresholds: {
                 2: '+1 attack range',
                 4: '+2 attack range',
                 6: '+3 attack range and +15% damage'
-            }
-        },
-        'Cavalry': {
+            } },
+        'Ithilien': {
             description: 'Cavalry units move faster',
             thresholds: {
                 2: '+15% move speed',
                 4: '+30% move speed and +10% attack'
-            }
-        },
-        'Defender': {
+            } },
+        'Hobbit': {
             description: 'Defenders gain health regeneration',
             thresholds: {
                 2: '1% HP regen per second',
                 3: '2% HP regen per second'
-            }
-        },
-        'Healer': {
+            } },
+        'Lothlórien': {
             description: 'Healers heal nearby allies',
             thresholds: {
                 1: 'Heal 1% HP per second',
                 2: 'Heal 2% HP per second',
                 3: 'Heal 3% HP per second'
-            }
-        },
+            } },
         'Rohan': {
             description: 'Rohan units gain charge damage',
             thresholds: {
                 2: '+20% first attack damage',
                 4: '+40% first attack damage'
-            }
-        },
+            } },
         'Dwarves': {
             description: 'Dwarves gain max health',
             thresholds: {
                 2: '+15% max health',
                 4: '+30% max health'
-            }
-        },
+            }  },
         'Elves': {
             description: 'Elves gain mana regeneration',
             thresholds: {
                 2: '+20% mana gain',
                 4: '+40% mana gain',
                 6: '+60% mana gain'
-            }
-        },
+            }  },
         'Mordor': {
             description: 'Mordor units gain attack power over time',
             thresholds: {
                 2: '+2% attack every 5 seconds',
                 4: '+4% attack every 5 seconds'
-            }
-        },
+            }  },
         'Isengard': {
             description: 'Isengard units gain splash damage',
             thresholds: {
                 2: '10% splash damage',
                 4: '25% splash damage'
-            }
-        },
+            }  },
         'Harad': {
             description: 'Harad units gain lifesteal',
             thresholds: {
                 2: '10% lifesteal',
                 4: '20% lifesteal'
-            }
-        },
+            } },
         'East': {
             description: 'Eastern units gain armor piercing',
             thresholds: {
                 2: '15% armor piercing',
                 3: '30% armor piercing'
-            }
-        },
-        'Goblin': {
+            } },
+        'Rivendell': {
             description: 'Goblins gain attack speed',
             thresholds: {
                 3: '+15% attack speed',
                 6: '+30% attack speed'
-            }
-        },
-        'Scavenger': {
+            }  },
+        'Mirkwood': {
             description: 'Scavengers gain gold on kills',
             thresholds: {
                 1: '+1 gold per kill',
                 3: '+2 gold per kill'
-            }
-        },
-        'Berserker': {
+            } },
+        ' ': {
             description: 'Berserkers gain rage when damaged',
             thresholds: {
                 1: '+5% attack when damaged',
                 2: '+10% attack when damaged'
-            }
-        },
+            } },
         'Royalty': {
             description: 'Royal units boost nearby allies',
             thresholds: {
                 1: '+10% stats to nearby allies',
                 2: '+20% stats to nearby allies'
-            }
-        },
-        'Spearman': {
+            }},
+        ' ': {
             description: 'Spearmen counter cavalry',
             thresholds: {
                 2: '+30% damage vs cavalry',
@@ -256,21 +267,15 @@ function getTraitDescription(trait, count) {
         }
     };
     
-    // Get description for this trait
     const traitInfo = descriptions[trait];
     if (!traitInfo) return 'No description available';
     
-    // Find the highest threshold that the count satisfies
-    const thresholds = Object.keys(traitInfo.thresholds)
-        .map(Number)
-        .sort((a, b) => b - a)
-        .find(threshold => count >= threshold);
-    
-    if (thresholds) {
-        return `${traitInfo.description}: ${traitInfo.thresholds[thresholds]}`;
-    } else {
-        return `${traitInfo.description} (inactive)`;
-    }
+    // Format all thresholds
+    let thresholdText = Object.entries(traitInfo.thresholds)
+        .map(([num, effect]) => `(${num}) ${effect}`)
+        .join(', ');
+
+    return `${traitInfo.description}: ${thresholdText}`; // Return base description and all thresholds
 }
 
 // Check if trait bonus is active
@@ -301,31 +306,26 @@ function isTraitBonusActive(trait, count) {
 
 // Modify the createUnitElement function to include traits
 function extendUnitElementWithTraits(original) {
-    return function(unitData, container, isShop) {
-        // Call the original function
+    return function(unitData, container, isShop) { // This is the NEW createUnitElement
+        console.log(`[Wrapper] Called for unitData named: ${unitData.name}`); // <<< ADDED
         const unit = original(unitData, container, isShop);
-        
-        // Add traits data attribute
+
         if (unitData.traits && Array.isArray(unitData.traits)) {
             unit.dataset.traits = JSON.stringify(unitData.traits);
+            console.log(`[Wrapper] Set data-traits for ${unit.dataset.name}:`, unit.dataset.traits); // <<< You might already have this one
+        } else {
+            console.log(`[Wrapper] Did NOT set data-traits for ${unitData.name}. unitData.traits:`, unitData.traits); // <<< You might already have this one
         }
-        
         return unit;
     };
 }
 
 // Initialize traits display
 function initTraitsDisplay() {
-    // Create container
+    window.UnitInfo.createUnitElement = extendUnitElementWithTraits(window.UnitInfo.createUnitElement);
     createTraitsContainer();
     
-    // Extend the unit creation function to include traits
-    if (window.UnitInfo && window.UnitInfo.createUnitElement) {
-        window.UnitInfo.createUnitElement = extendUnitElementWithTraits(window.UnitInfo.createUnitElement);
-    }
     
-    // Update traits when units change
-    const updateInterval = setInterval(updateTraitsDisplay, 1000);
     
     // Also update on specific events
     document.addEventListener('unitAdded', updateTraitsDisplay);
@@ -341,26 +341,20 @@ function initTraitsDisplay() {
 function addTraitsStyles() {
     const style = document.createElement('style');
     style.textContent = `
-        .game-container {
-            display: flex;
-            flex-direction: row;
-            gap: 20px;
-            max-width: 1000px;
-            align-items: flex-start;
-        }
-        
         .traits-container {
-            width: 180px;
+            width: 180px; /* Or your desired width */
             background-color: rgba(34, 34, 34, 0.8);
             border-radius: 5px;
             padding: 10px;
-            margin-top: 72px;
+            margin-top: 72px; /* Adjust or remove margin as needed */
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
             border: 2px solid #594e2d;
-            max-height: 500px;
+            max-height: 500px; /* Adjust as needed */
             overflow-y: auto;
+            Add flex-shrink: 0;
+            flex-shrink: 0;
         }
-        
+
         .traits-title {
             font-weight: bold;
             text-align: center;
@@ -368,22 +362,35 @@ function addTraitsStyles() {
             color: #ffd700;
             font-size: 16px;
         }
-        
+
         .trait-item {
             display: flex;
             align-items: center;
             margin-bottom: 8px;
             padding: 5px;
-            background-color: rgba(50, 50, 50, 0.5);
+            /* Remove background color change from here if you only want text color change */
+            /* background-color: rgba(50, 50, 50, 0.5); */
             border-radius: 4px;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s, color 0.3s, font-weight 0.3s; /* Added color/font-weight transition */
         }
-        
-        .trait-active {
-            background-color: rgba(80, 100, 50, 0.5);
-            border-left: 3px solid #ffd700;
+
+        /* Style for the text part when trait is INACTIVE */
+        .trait-inactive .trait-info { /* Target the text container */
+            color: #888; /* Grey color */
+            font-weight: normal;
         }
-        
+         /* Style for the text part when trait is ACTIVE */
+        .trait-active .trait-info { /* Target the text container */
+            color: white; /* White color */
+            font-weight: bold;
+        }
+
+        /* Optional: Keep background highlight for active traits if desired */
+         .trait-active {
+             background-color: rgba(80, 100, 50, 0.5); /* Example active background */
+             border-left: 3px solid #ffd700;
+         }
+
         .trait-icon {
             font-size: 18px;
             margin-right: 8px;
@@ -392,42 +399,25 @@ function addTraitsStyles() {
             display: flex;
             justify-content: center;
             align-items: center;
+            /* Ensure icon color isn't overridden if you want it consistent */
+             color: #ccc; /* Or keep its default */
         }
-        
+
         .trait-info {
             flex: 1;
+             /* Set default text color here if needed, otherwise controlled by active/inactive */
+             /* color: #ccc; */ /* Example default if needed */
         }
-        
+
         .trait-name {
-            font-weight: bold;
+            /* font-weight: bold; */ /* Remove bold from base, let active/inactive handle it */
             font-size: 14px;
         }
-        
+
         .trait-description {
             font-size: 11px;
-            color: #cccccc;
+            /* color: #cccccc; */ /* Color controlled by parent .trait-info active/inactive */
             margin-top: 2px;
-        }
-        
-        /* Adjust battlefield layout */
-        .battlefield, .shop, .bench, .controls {
-            flex: 1;
-        }
-        
-        /* Make controls go across full width */
-        .controls {
-            width: 100%;
-            order: -1;
-        }
-        
-        /* Make the shop, battlefield, and bench display in column */
-        .game-container {
-            flex-wrap: wrap;
-        }
-        
-        .shop, .battlefield, .bench {
-            width: calc(100% - 200px);
-            margin-left: auto;
         }
     `;
     document.head.appendChild(style);
